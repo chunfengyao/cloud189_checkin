@@ -166,8 +166,8 @@ def main():
     response = s.get(url, headers=headers)
     if ("errorCode" in response.text):
         print(response.text)
-        res2 = f"==>TASK_SIGNIN:{response.text}"
-        hasError = True
+        res2 = f"==>TASK_SIGNIN :{response.text}"
+    #    hasError = True
     else:
         description = response.json()['description']
         print(f"任务①抽奖获得{description}")
@@ -177,8 +177,8 @@ def main():
     response = s.get(url2, headers=headers)
     if ("errorCode" in response.text):
         print(response.text)
-        res3 = f"==>TASK_SIGNIN_PHOTOS:{response.text}"
-        hasError = True
+        res3 = f"==>TASK_SIGNIN_PHOTOS :{response.text}"
+    #    hasError = True
     else:
         description = response.json()['description']
         print(f"任务②抽奖获得{description}")
@@ -188,14 +188,16 @@ def main():
     response = s.get(url3, headers=headers)
     if ("errorCode" in response.text):
         print(response.text)
-        res4 = f"==>TASK_2022_FLDFS_KJ:{response.text}"
-        hasError = True
+        res4 = f"==>TASK_2022_FLDFS_KJ :{response.text}"
+    #    hasError = True
     else:
         description = response.json()['description']
         print(f"任务③抽奖获得{description}")
         res4 = f"今日任务③抽奖获得{description}"
     if (not disable_notify) or hasError:
-        send("天翼云签到", f"sing189 \n{res1}\n{res2}\n{res3}\n{res4}")
+        send("天翼云盘签到V1", f"sing189 \n{res1}\n{res2}\n{res3}\n{res4}")
+    else:
+        print(f"\n==>Skip notify,as hasError:{hasError},disable_notify:{disable_notify}")
 def lambda_handler(event, context):  # aws default
     main()
 
