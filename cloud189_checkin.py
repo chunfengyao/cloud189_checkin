@@ -24,6 +24,7 @@ s = requests.Session()
 # 变量 __cloud189_phone（手机号）,__cloud189_password（密码）
 username = os.getenv("__cloud189_phone")
 password = os.getenv("__cloud189_password")
+disable_notify = bool(os.getenv("__cloud189_disable_notify")) | False
 
 def int2char(a):
     return BI_RM[a]
@@ -138,14 +139,20 @@ def main():
         "Host": "m.cloud.189.cn",
         "Accept-Encoding": "gzip, deflate",
     }
+
+    hasError = False
+
     response = s.get(surl, headers=headers)
     netdiskBonus = response.json()['netdiskBonus']
     if (response.json()['isSign'] == "false"):
         print(f"未签到，签到获得{netdiskBonus}M空间")
         res1 = f"今日签到获得{netdiskBonus}M空间"
-    else:
+    elif netdiskBonus:
         print(f"已经签到过了，签到获得{netdiskBonus}M空间")
         res1 = f"今日签到获得{netdiskBonus}M空间"
+    else :
+        hasError = True
+        print(f"可能发生了一些错误：{response.text}")
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Linux; Android 5.1.1; SM-G930K Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136 Mobile Safari/537.36 Ecloud/8.6.3 Android/22 clientId/355325117317828 clientModel/SM-G930K imsi/460071114317824 clientChannelId/qq proVersion/1.0.6',
@@ -153,32 +160,42 @@ def main():
         "Host": "m.cloud.189.cn",
         "Accept-Encoding": "gzip, deflate",
     }
+
+
+    time.sleep(random.randint(5, 30))
     response = s.get(url, headers=headers)
     if ("errorCode" in response.text):
         print(response.text)
-        res2 = ""
+        res2 = f"==>TASK_SIGNIN:{response.text}"
+        hasError = True
     else:
         description = response.json()['description']
         print(f"任务①抽奖获得{description}")
         res2 = f"今日任务①抽奖获得{description}"
+
+    time.sleep(random.randint(10, 30))
     response = s.get(url2, headers=headers)
     if ("errorCode" in response.text):
         print(response.text)
-        res3 = ""
+        res3 = f"==>TASK_SIGNIN_PHOTOS:{response.text}"
+        hasError = True
     else:
         description = response.json()['description']
         print(f"任务②抽奖获得{description}")
         res3 = f"今日任务②抽奖获得{description}"
 
+    time.sleep(random.randint(5, 30))
     response = s.get(url3, headers=headers)
     if ("errorCode" in response.text):
         print(response.text)
-        res4 = ""
+        res4 = f"==>TASK_2022_FLDFS_KJ:{response.text}"
+        hasError = True
     else:
         description = response.json()['description']
         print(f"任务③抽奖获得{description}")
         res4 = f"今日任务③抽奖获得{description}"
-    send("天翼云签到", f"sing189 \n{res1}\n{res2}\n{res3}\n{res4}")
+    if (not disable_notify) or hasError:
+        send("天翼云签到", f"sing189 \n{res1}\n{res2}\n{res3}\n{res4}")
 def lambda_handler(event, context):  # aws default
     main()
 
